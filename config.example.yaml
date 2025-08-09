@@ -30,9 +30,12 @@ openai:
   # Default: minimal for GPT-5 series, low for other reasoning models
   reasoning_effort: minimal
   
-  # Default system prompt for all queries (optional)
-  # Can be overridden with --system flag in commands
-  system_prompt: "You are a shell command assistant. Respond only with the exact command to execute, nothing else. Include pipes, flags, and arguments as needed. Assume bash/Linux unless specified otherwise. No explanations, no markdown, just the command."
+  # Custom system prompt (optional)
+  # Leave empty to use mode-specific defaults:
+  # - Query mode (-q): "You are a helpful assistant, answer as concisely as possible to the user."
+  # - Shell mode (-s): "You are a shell command assistant. Respond only with the exact command to execute..."
+  # - Chat mode (-c): "You are a helpful assistant, answer as concisely as possible to the user."
+  system_prompt: ""
   
   # Top-p sampling (nucleus sampling)
   top_p: 1.0

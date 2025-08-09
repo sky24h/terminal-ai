@@ -247,7 +247,7 @@ func setDefaults(v *viper.Viper, profile string) {
 	v.SetDefault("openai.top_p", 1.0)
 	v.SetDefault("openai.n", 1)
 	v.SetDefault("openai.reasoning_effort", "low") // Default for reasoning models
-	v.SetDefault("openai.system_prompt", "You are a shell command assistant. Respond only with the exact command to execute, nothing else. Include pipes, flags, and arguments as needed. Assume bash/Linux unless specified otherwise. No explanations, no markdown, just the command.") // Default system prompt for shell assistance
+	v.SetDefault("openai.system_prompt", "") // No default system prompt - will be set by each mode
 
 	// Cache defaults
 	v.SetDefault("cache.enabled", true)

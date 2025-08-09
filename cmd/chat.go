@@ -62,7 +62,7 @@ Example:
   terminal-ai chat --model gpt-4
   terminal-ai chat --system "You are a helpful coding assistant"
   terminal-ai chat --load previous-chat.json`,
-	RunE: runChat,
+	RunE: RunChat,
 }
 
 func init() {
@@ -88,7 +88,8 @@ func init() {
 	viper.BindPFlag("chat.multiline", chatCmd.Flags().Lookup("multiline"))
 }
 
-func runChat(cmd *cobra.Command, args []string) error {
+// RunChat runs the chat command - exported for use in simple mode
+func RunChat(cmd *cobra.Command, args []string) error {
 	// Get AI client
 	client := GetAIClient()
 	if client == nil {

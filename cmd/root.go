@@ -33,23 +33,12 @@ It provides chat capabilities, quick queries, and streaming responses
 directly in your terminal.
 
 Quick Start:
-  terminal-ai query "What is Go?"
-  terminal-ai chat
-  terminal-ai config init`,
+  terminal-ai -q "What is Go?"
+  terminal-ai -s "list docker containers"
+  terminal-ai -c`,
 	Version: version,
-	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-		// Skip for config init command
-		if cmd.Name() == "config" && len(args) == 0 {
-			for _, flag := range []string{"init", "wizard"} {
-				if f := cmd.Flag(flag); f != nil && f.Changed {
-					return nil
-				}
-			}
-		}
-
-		// Initialize config and AI client
-		return initializeApp()
-	},
+	DisableFlagParsing: false,
+	TraverseChildren: true,
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.

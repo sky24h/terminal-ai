@@ -67,20 +67,20 @@ terminal-ai config --test
 ### 3. Start using the assistant:
 
 ```bash
-# Quick query
-terminal-ai query "What is Go?"
+# Quick query mode (-q or default)
+terminal-ai -q "What is Go?"
+terminal-ai "What is Go?"  # Same as above
 
-# Interactive chat session
-terminal-ai chat
+# Shell command generator (-s)
+terminal-ai -s "list all docker containers"
+# → Shows command and asks: Execute? [Enter/E/N/Q]
 
-# Use a specific model
-terminal-ai query --model gpt-4 "Explain quantum computing"
+# Interactive chat mode (-c)
+terminal-ai -c
 
-# Show token usage
-terminal-ai query --tokens "Hello, world!"
-
-# Save response to file
-terminal-ai query --output response.md "Write a Python quicksort"
+# With options
+terminal-ai -q -m gpt-4 "Explain quantum computing"
+terminal-ai -s --no-stream "find large files"
 ```
 
 ## Configuration
@@ -151,55 +151,77 @@ export TERMINAL_AI_UI_STREAMING_ENABLED="true"
 export TERMINAL_AI_LOGGING_LEVEL="info"
 ```
 
-## Commands
+## Usage Modes
 
-### `chat` - Interactive Chat
-
-Start an interactive chat session with conversation history:
+### Query Mode (`-q`)
+Quick one-off questions with concise answers:
 
 ```bash
-terminal-ai chat [flags]
-
-Flags:
-  -m, --model string        AI model to use (default "gpt-3.5-turbo")
-  -t, --temperature float   Temperature for response generation (default 0.7)
-      --max-tokens int      Maximum tokens in response (default 2000)
-  -s, --stream             Stream responses in real-time (default true)
-      --system string       System prompt to set context
-      --save string         Auto-save conversation to file
-      --load string         Load previous conversation
-
-Interactive Commands:
-  /help       Show available commands
-  /clear      Clear conversation history
-  /save       Save current conversation
-  /load       Load a saved conversation
-  /export     Export conversation as markdown
-  /model      Change the AI model
-  /system     Set system prompt
-  /multiline  Toggle multiline input mode
-  /history    Show conversation history
-  /exit       Exit chat session
+terminal-ai -q "What is Docker?"
+terminal-ai "How to reverse a string in Python?"  # -q is default
 ```
+
+### Shell Mode (`-s`)
+Generate and optionally execute shell commands:
+
+```bash
+terminal-ai -s "find all log files larger than 100MB"
+# Output:
+# 📝 Command: find / -name "*.log" -size +100M 2>/dev/null
+# 🔸 Execute? [Enter/E=Execute, N=No, Q=Quit]: 
+```
+
+Interactive refinement:
+- Press Enter or E to execute the command
+- Press N to provide feedback and get a new suggestion
+- Press Q to quit
+
+### Chat Mode (`-c`)
+Interactive conversation with context:
+
+```bash
+terminal-ai -c
+```
+
+**Chat Commands:**
+- `/help` - Show available commands
+- `/clear` - Clear conversation history
+- `/save` - Save current conversation
+- `/load` - Load a saved conversation
+- `/export` - Export conversation as markdown
+- `/model` - Change the AI model
+- `/system` - Set system prompt
+- `/multiline` - Toggle multiline input mode
+- `/history` - Show conversation history
+- `/exit` - Exit chat session
+
+## Global Options
+
+```bash
+-q, --query         Query mode (default when text provided)
+-s, --shell         Shell command generator mode
+-c, --chat          Interactive chat mode
+-m, --model string  Override default model
+    --stream        Enable streaming (default true)
+-v, --verbose       Verbose output
+    --no-color      Disable colored output
+    --config file   Custom config file path
+```
+
+## Legacy Commands
+
+The following commands are still available for backward compatibility:
 
 ### `query` - Quick Query
 
-Send a one-off query without starting a chat session:
-
 ```bash
 terminal-ai query "your question" [flags]
+```
 
-Flags:
-  -m, --model string       AI model to use (default "gpt-3.5-turbo")
-  -t, --temperature float  Temperature (0-2, default 0.7)
-      --max-tokens int     Maximum tokens (default 2000)
-      --top-p float        Top-p sampling (default 1.0)
-  -s, --system string      System prompt for context
-  -c, --context string     Additional context from file
-  -o, --output string      Save response to file
-  -f, --format string      Output format: plain, markdown, json (default "markdown")
-      --tokens             Show token usage statistics
-      --no-cache           Skip cache for this query
+### `chat` - Interactive Chat
+
+```bash
+terminal-ai chat [flags]
 ```
 
 ### `config` - Configuration Management
