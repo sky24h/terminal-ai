@@ -37,6 +37,15 @@ openai:
   # - Chat mode (-c): "You are a helpful assistant, answer as concisely as possible to the user."
   system_prompt: ""
   
+  # Service tier for API requests (auto, default, priority, flex, scale)
+  # - auto: Uses project settings
+  # - default: Standard processing (default for all models)
+  # - priority: Faster, more consistent performance (premium pricing, enterprise only)
+  # - flex: Flexible processing for non-time-sensitive tasks
+  # - scale: Dedicated capacity with predictable performance
+  # All models use "default" unless overridden via --service-tier flag
+  service_tier: default
+  
   # Top-p sampling (nucleus sampling)
   top_p: 1.0
   
