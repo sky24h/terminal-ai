@@ -41,7 +41,7 @@ Examples:
   terminal-ai config --test       # Test API connection
   terminal-ai config --edit       # Open config in editor
   terminal-ai config --location   # Show config file location
-  terminal-ai config set openai.model gpt-4
+  terminal-ai config set openai.model gpt-5-mini
   terminal-ai config get openai.model`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		// Handle flags
@@ -76,7 +76,7 @@ var configSetCmd = &cobra.Command{
 
 Examples:
   terminal-ai config set openai.api_key "sk-..."
-  terminal-ai config set openai.model gpt-4
+  terminal-ai config set openai.model gpt-5-mini
   terminal-ai config set ui.color_output false
   terminal-ai config set cache.enabled true`,
 	Args: cobra.ExactArgs(2),

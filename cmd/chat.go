@@ -59,7 +59,7 @@ Commands during chat:
 
 Example:
   terminal-ai chat
-  terminal-ai chat --model gpt-4
+  terminal-ai chat --model gpt-5
   terminal-ai chat --system "You are a helpful coding assistant"
   terminal-ai chat --load previous-chat.json`,
 	RunE: RunChat,

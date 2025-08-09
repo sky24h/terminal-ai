@@ -67,9 +67,9 @@ terminal-ai config --test
 ### 3. Start using the assistant:
 
 ```bash
-# Quick query mode (-q or default)
-terminal-ai -q "What is Go?"
-terminal-ai "What is Go?"  # Same as above
+# Shell command mode (-s or default)
+terminal-ai -s "list all docker containers"
+terminal-ai "find large files"  # Same as above, defaults to -s
 
 # Shell command generator (-s)
 terminal-ai -s "list all docker containers"
@@ -79,7 +79,7 @@ terminal-ai -s "list all docker containers"
 terminal-ai -c
 
 # With options
-terminal-ai -q -m gpt-4 "Explain quantum computing"
+terminal-ai -q -m gpt-5 "Explain quantum computing"
 terminal-ai -s --no-stream "find large files"
 ```
 
@@ -107,7 +107,7 @@ openai:
 
 # Model Types:
 # Reasoning (temp=1.0): gpt-5, gpt-5-mini, gpt-5-nano, o1, o1-mini, o3, o3-mini, o4-mini
-# Non-reasoning: gpt-4.1, gpt-4.1-mini, gpt-4.1-nano, gpt-4o, gpt-4o-mini, gpt-4, gpt-3.5-turbo
+# Non-reasoning: gpt-4.1, gpt-4.1-mini, gpt-4.1-nano, gpt-4o, gpt-4o-mini
 
 cache:
   enabled: true
@@ -134,7 +134,7 @@ All configuration options can be set via environment variables:
 ```bash
 # OpenAI settings
 export TERMINAL_AI_OPENAI_API_KEY="sk-..."
-export TERMINAL_AI_OPENAI_MODEL="gpt-4"
+export TERMINAL_AI_OPENAI_MODEL="gpt-5-mini"
 export TERMINAL_AI_OPENAI_TEMPERATURE="0.7"
 export TERMINAL_AI_OPENAI_MAX_TOKENS="2000"
 
@@ -158,14 +158,15 @@ Quick one-off questions with concise answers:
 
 ```bash
 terminal-ai -q "What is Docker?"
-terminal-ai "How to reverse a string in Python?"  # -q is default
+terminal-ai -q "How to reverse a string in Python?"
 ```
 
-### Shell Mode (`-s`)
+### Shell Mode (`-s`) - DEFAULT
 Generate and optionally execute shell commands:
 
 ```bash
-terminal-ai -s "find all log files larger than 100MB"
+terminal-ai "find all log files larger than 100MB"  # defaults to -s
+terminal-ai -s "list docker containers"
 # Output:
 # 📝 Command: find / -name "*.log" -size +100M 2>/dev/null
 # 🔸 Execute? [Enter/E=Execute, N=No, Q=Quit]: 
@@ -198,7 +199,8 @@ terminal-ai -c
 ## Global Options
 
 ```bash
--q, --query         Query mode (default when text provided)
+-q, --query         Query mode for questions
+-s, --shell         Shell command generator mode (default when text provided)
 -s, --shell         Shell command generator mode
 -c, --chat          Interactive chat mode
 -m, --model string  Override default model
@@ -243,7 +245,7 @@ Flags:
 
 Examples:
   terminal-ai config --init                    # Run setup wizard
-  terminal-ai config set openai.model gpt-4    # Set model
+  terminal-ai config set openai.model gpt-5-mini    # Set model
   terminal-ai config get openai.model          # Get current model
   terminal-ai config --test                    # Test API connection
 ```

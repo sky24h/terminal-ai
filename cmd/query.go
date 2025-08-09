@@ -35,7 +35,7 @@ This is useful for quick questions without starting an interactive session.
 
 Examples:
   terminal-ai query "What is the capital of France?"
-  terminal-ai query "Explain quantum computing" --model gpt-4
+  terminal-ai query "Explain quantum computing" --model gpt-5
   terminal-ai query "Write a Python function to sort a list" --output result.txt
   terminal-ai query "Translate to Spanish: Hello world" --format plain
   terminal-ai query "Code review this function" --system "You are a code reviewer" --context "def add(a,b): return a+b"`,

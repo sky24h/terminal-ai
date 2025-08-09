@@ -31,7 +31,7 @@ const (
 func init() {
 	// Add simple mode flags to root command
 	rootCmd.Flags().BoolVarP(&queryFlag, "query", "q", false, "Quick query mode - ask a question and get a concise answer")
-	rootCmd.Flags().BoolVarP(&shellFlag, "shell", "s", false, "Shell command mode - generate and optionally execute shell commands")
+	rootCmd.Flags().BoolVarP(&shellFlag, "shell", "s", false, "Shell command mode (default) - generate and optionally execute shell commands")
 	rootCmd.Flags().BoolVarP(&chatFlag, "chat", "c", false, "Interactive chat mode with the AI assistant")
 	rootCmd.Flags().StringVarP(&modelFlag, "model", "m", "", "Override default model")
 	rootCmd.Flags().BoolVar(&streamFlag, "stream", true, "Enable streaming responses")
@@ -60,11 +60,11 @@ func runSimpleMode(cmd *cobra.Command, args []string) {
 		os.Exit(1)
 	}
 
-	// If no mode selected and no subcommand, handle as query if args provided
+	// If no mode selected and no subcommand, handle as shell if args provided
 	if modeCount == 0 {
 		if len(args) > 0 {
-			// Default to query mode if text is provided
-			queryFlag = true
+			// Default to shell mode if text is provided
+			shellFlag = true
 		} else {
 			// Show help if no mode and no args
 			cmd.Help()
