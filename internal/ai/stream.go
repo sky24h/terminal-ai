@@ -79,6 +79,26 @@ func (h *StreamHandler) HandleStream(ctx context.Context, messages []openai.Chat
 		params.User = openai.String(options.User)
 	}
 
+	// Handle ServiceTier
+	if options.ServiceTier != "" {
+		switch options.ServiceTier {
+		case "auto":
+			params.ServiceTier = openai.ChatCompletionNewParamsServiceTierAuto
+		case "default":
+			params.ServiceTier = openai.ChatCompletionNewParamsServiceTierDefault
+		case "priority":
+			params.ServiceTier = openai.ChatCompletionNewParamsServiceTierPriority
+		case "flex":
+			params.ServiceTier = openai.ChatCompletionNewParamsServiceTierFlex
+		case "scale":
+			params.ServiceTier = openai.ChatCompletionNewParamsServiceTierScale
+		default:
+			params.ServiceTier = openai.ChatCompletionNewParamsServiceTierAuto
+		}
+	} else {
+		params.ServiceTier = openai.ChatCompletionNewParamsServiceTierDefault
+	}
+
 	// Handle ReasoningEffort for reasoning models
 	if config.IsReasoningModel(options.Model) && options.ReasoningEffort != "" {
 		switch options.ReasoningEffort {

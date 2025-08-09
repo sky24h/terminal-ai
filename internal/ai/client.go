@@ -51,6 +51,7 @@ type ChatOptions struct {
 	FrequencyPenalty float32  `json:"frequency_penalty,omitempty"`
 	User             string   `json:"user,omitempty"`
 	ReasoningEffort  string   `json:"reasoning_effort,omitempty"` // For reasoning models: low, medium, high
+	ServiceTier      string   `json:"service_tier,omitempty"`     // Service tier: auto, default, priority, flex, scale
 }
 
 // Response represents an AI response
@@ -214,6 +215,7 @@ func (c *OpenAIClient) Query(ctx context.Context, prompt string) (string, error)
 		MaxTokens:       c.config.OpenAI.MaxTokens,
 		TopP:            c.config.OpenAI.TopP,
 		ReasoningEffort: c.config.OpenAI.ReasoningEffort,
+		ServiceTier:     c.config.OpenAI.ServiceTier,
 	}
 
 	resp, err := c.Chat(ctx, messages, options)
@@ -260,6 +262,7 @@ func (c *OpenAIClient) StreamQuery(ctx context.Context, prompt string, callback 
 		MaxTokens:       c.config.OpenAI.MaxTokens,
 		TopP:            c.config.OpenAI.TopP,
 		ReasoningEffort: c.config.OpenAI.ReasoningEffort,
+		ServiceTier:     c.config.OpenAI.ServiceTier,
 	}
 
 	// Convert to OpenAI messages
@@ -350,6 +353,28 @@ func (c *OpenAIClient) Chat(ctx context.Context, messages []Message, options Cha
 		params.User = openai.String(options.User)
 	}
 
+	// Handle ServiceTier
+	if options.ServiceTier != "" {
+		switch options.ServiceTier {
+		case "auto":
+			params.ServiceTier = openai.ChatCompletionNewParamsServiceTierAuto
+		case "default":
+			params.ServiceTier = openai.ChatCompletionNewParamsServiceTierDefault
+		case "priority":
+			params.ServiceTier = openai.ChatCompletionNewParamsServiceTierPriority
+		case "flex":
+			params.ServiceTier = openai.ChatCompletionNewParamsServiceTierFlex
+		case "scale":
+			params.ServiceTier = openai.ChatCompletionNewParamsServiceTierScale
+		default:
+			// If not specified or invalid, use auto
+			params.ServiceTier = openai.ChatCompletionNewParamsServiceTierAuto
+		}
+	} else {
+		// Default to standard processing if not specified
+		params.ServiceTier = openai.ChatCompletionNewParamsServiceTierDefault
+	}
+
 	// Handle ReasoningEffort for reasoning models
 	if config.IsReasoningModel(options.Model) && options.ReasoningEffort != "" {
 		switch options.ReasoningEffort {
@@ -368,6 +393,7 @@ func (c *OpenAIClient) Chat(ctx context.Context, messages []Message, options Cha
 		log.Debug().
 			Str("model", options.Model).
 			Str("reasoning_effort", options.ReasoningEffort).
+			Str("service_tier", options.ServiceTier).
 			Msg("Using reasoning model with effort level")
 	}
 

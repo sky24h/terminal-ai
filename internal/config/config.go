@@ -33,6 +33,7 @@ type OpenAIConfig struct {
 	Stop           []string      `mapstructure:"stop"`
 	ReasoningEffort string       `mapstructure:"reasoning_effort"` // minimal, low, medium, high (for reasoning models)
 	SystemPrompt   string        `mapstructure:"system_prompt"`   // Default system prompt for queries
+	ServiceTier    string        `mapstructure:"service_tier"`    // auto, default, priority, flex, scale
 }
 
 // CacheConfig contains cache-related settings
@@ -210,6 +211,28 @@ func IsReasoningModel(model string) bool {
 	return reasoningModels[model]
 }
 
+// IsGPT5Model checks if the model is a GPT-5 series model
+func IsGPT5Model(model string) bool {
+	gpt5Models := map[string]bool{
+		"gpt-5":      true,
+		"gpt-5-mini": true,
+		"gpt-5-nano": true,
+	}
+	return gpt5Models[model]
+}
+
+// GetRecommendedServiceTier returns the recommended service tier for a model
+// Always uses "default" unless explicitly overridden
+func GetRecommendedServiceTier(model string, currentTier string) string {
+	// If a specific tier is already set, keep it
+	if currentTier != "" {
+		return currentTier
+	}
+	
+	// Always use default for all models unless overridden
+	return "default"
+}
+
 // AdjustForModelType adjusts configuration based on whether the model is a reasoning model
 func AdjustForModelType(config *Config) {
 	if IsReasoningModel(config.OpenAI.Model) {
@@ -234,6 +257,9 @@ func AdjustForModelType(config *Config) {
 			config.OpenAI.Temperature = 0.7
 		}
 	}
+	
+	// Adjust service tier based on model
+	config.OpenAI.ServiceTier = GetRecommendedServiceTier(config.OpenAI.Model, config.OpenAI.ServiceTier)
 }
 
 // setDefaults sets default configuration values based on profile
@@ -248,6 +274,7 @@ func setDefaults(v *viper.Viper, profile string) {
 	v.SetDefault("openai.n", 1)
 	v.SetDefault("openai.reasoning_effort", "low") // Default for reasoning models
 	v.SetDefault("openai.system_prompt", "") // No default system prompt - will be set by each mode
+	v.SetDefault("openai.service_tier", "default") // Default to standard processing
 
 	// Cache defaults
 	v.SetDefault("cache.enabled", true)
