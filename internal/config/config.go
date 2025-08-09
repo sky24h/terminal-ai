@@ -31,7 +31,8 @@ type OpenAIConfig struct {
 	TopP           float32       `mapstructure:"top_p"`
 	N              int           `mapstructure:"n"`
 	Stop           []string      `mapstructure:"stop"`
-	ReasoningEffort string       `mapstructure:"reasoning_effort"` // low, medium, high (for reasoning models)
+	ReasoningEffort string       `mapstructure:"reasoning_effort"` // minimal, low, medium, high (for reasoning models)
+	SystemPrompt   string        `mapstructure:"system_prompt"`   // Default system prompt for queries
 }
 
 // CacheConfig contains cache-related settings
@@ -217,7 +218,12 @@ func AdjustForModelType(config *Config) {
 		
 		// Set default reasoning effort if not specified
 		if config.OpenAI.ReasoningEffort == "" {
-			config.OpenAI.ReasoningEffort = "low"
+			// Use "minimal" for GPT-5 series, "low" for others
+			if strings.HasPrefix(config.OpenAI.Model, "gpt-5") {
+				config.OpenAI.ReasoningEffort = "minimal"
+			} else {
+				config.OpenAI.ReasoningEffort = "low"
+			}
 		}
 	} else {
 		// Non-reasoning models don't use reasoning_effort
@@ -241,6 +247,7 @@ func setDefaults(v *viper.Viper, profile string) {
 	v.SetDefault("openai.top_p", 1.0)
 	v.SetDefault("openai.n", 1)
 	v.SetDefault("openai.reasoning_effort", "low") // Default for reasoning models
+	v.SetDefault("openai.system_prompt", "You are a shell command assistant. Respond only with the exact command to execute, nothing else. Include pipes, flags, and arguments as needed. Assume bash/Linux unless specified otherwise. No explanations, no markdown, just the command.") // Default system prompt for shell assistance
 
 	// Cache defaults
 	v.SetDefault("cache.enabled", true)

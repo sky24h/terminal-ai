@@ -25,9 +25,14 @@ openai:
   # Non-reasoning models can use 0.0-2.0
   temperature: 1.0
   
-  # Reasoning effort for reasoning models (low, medium, high)
+  # Reasoning effort for reasoning models (minimal, low, medium, high)
   # Only applies to reasoning models like gpt-5, o1, o3
-  reasoning_effort: low
+  # Default: minimal for GPT-5 series, low for other reasoning models
+  reasoning_effort: minimal
+  
+  # Default system prompt for all queries (optional)
+  # Can be overridden with --system flag in commands
+  system_prompt: "You are a shell command assistant. Respond only with the exact command to execute, nothing else. Include pipes, flags, and arguments as needed. Assume bash/Linux unless specified otherwise. No explanations, no markdown, just the command."
   
   # Top-p sampling (nucleus sampling)
   top_p: 1.0

@@ -133,11 +133,15 @@ func runChat(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	// Add system prompt if specified
-	if chatSystemPrompt != "" {
+	// Add system prompt (use specified or default from config)
+	systemPrompt := chatSystemPrompt
+	if systemPrompt == "" && cfg.OpenAI.SystemPrompt != "" {
+		systemPrompt = cfg.OpenAI.SystemPrompt
+	}
+	if systemPrompt != "" {
 		messages = append([]ai.Message{{
 			Role:    "system",
-			Content: chatSystemPrompt,
+			Content: systemPrompt,
 		}}, messages...)
 	}
 

@@ -10,8 +10,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/openai/openai-go"
-	"github.com/openai/openai-go/shared"
+	"github.com/openai/openai-go/v2"
+	"github.com/openai/openai-go/v2/shared"
 	"github.com/rs/zerolog/log"
 	"github.com/user/terminal-ai/internal/config"
 )
@@ -82,6 +82,8 @@ func (h *StreamHandler) HandleStream(ctx context.Context, messages []openai.Chat
 	// Handle ReasoningEffort for reasoning models
 	if config.IsReasoningModel(options.Model) && options.ReasoningEffort != "" {
 		switch options.ReasoningEffort {
+		case "minimal":
+			params.ReasoningEffort = shared.ReasoningEffortMinimal
 		case "low":
 			params.ReasoningEffort = shared.ReasoningEffortLow
 		case "medium":
@@ -89,7 +91,7 @@ func (h *StreamHandler) HandleStream(ctx context.Context, messages []openai.Chat
 		case "high":
 			params.ReasoningEffort = shared.ReasoningEffortHigh
 		default:
-			params.ReasoningEffort = shared.ReasoningEffortLow
+			params.ReasoningEffort = shared.ReasoningEffortMinimal
 		}
 	}
 

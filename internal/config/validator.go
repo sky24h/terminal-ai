@@ -82,7 +82,7 @@ func (v *Validator) validateOpenAI() {
 	// Reasoning effort validation (only for reasoning models)
 	if IsReasoningModel(v.config.OpenAI.Model) {
 		if v.config.OpenAI.ReasoningEffort != "" && !v.isValidReasoningEffort(v.config.OpenAI.ReasoningEffort) {
-			v.errors = append(v.errors, fmt.Sprintf("invalid reasoning_effort: %s (must be low, medium, or high)", v.config.OpenAI.ReasoningEffort))
+			v.errors = append(v.errors, fmt.Sprintf("invalid reasoning_effort: %s (must be minimal, low, medium, or high)", v.config.OpenAI.ReasoningEffort))
 		}
 	}
 
@@ -358,7 +358,7 @@ func (v *Validator) isValidOrgID(orgID string) bool {
 
 // isValidReasoningEffort validates the reasoning_effort parameter
 func (v *Validator) isValidReasoningEffort(effort string) bool {
-	validEfforts := []string{"low", "medium", "high"}
+	validEfforts := []string{"minimal", "low", "medium", "high"}
 	return v.contains(validEfforts, effort)
 }
 

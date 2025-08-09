@@ -87,11 +87,15 @@ func runQuery(question string) error {
 	// Prepare messages
 	var messages []ai.Message
 
-	// Add system message if provided
-	if querySystem != "" {
+	// Add system message (use specified or default from config)
+	systemPrompt := querySystem
+	if systemPrompt == "" && config.OpenAI.SystemPrompt != "" {
+		systemPrompt = config.OpenAI.SystemPrompt
+	}
+	if systemPrompt != "" {
 		messages = append(messages, ai.Message{
 			Role:    "system",
-			Content: querySystem,
+			Content: systemPrompt,
 		})
 	}
 
