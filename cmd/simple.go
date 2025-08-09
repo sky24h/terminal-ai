@@ -9,16 +9,19 @@ import (
 	"runtime"
 	"strings"
 
+	"github.com/charmbracelet/lipgloss"
 	"github.com/spf13/cobra"
 	"github.com/user/terminal-ai/internal/ai"
+	"github.com/user/terminal-ai/internal/ui"
 )
 
 var (
-	queryFlag  bool
-	shellFlag  bool
-	chatFlag   bool
-	modelFlag  string
-	streamFlag bool
+	queryFlag      bool
+	shellFlag      bool
+	chatFlag       bool
+	modelFlag      string
+	streamFlag     bool
+	serviceTierFlag string
 )
 
 const (
@@ -35,6 +38,7 @@ func init() {
 	rootCmd.Flags().BoolVarP(&chatFlag, "chat", "c", false, "Interactive chat mode with the AI assistant")
 	rootCmd.Flags().StringVarP(&modelFlag, "model", "m", "", "Override default model")
 	rootCmd.Flags().BoolVar(&streamFlag, "stream", true, "Enable streaming responses")
+	rootCmd.Flags().StringVar(&serviceTierFlag, "service-tier", "", "Service tier (auto, default, priority, flex, scale)")
 
 	// Set the Run function for root command and allow unknown args
 	rootCmd.Run = runSimpleMode
@@ -74,6 +78,11 @@ func runSimpleMode(cmd *cobra.Command, args []string) {
 
 	// Initialize app if not already done
 	if appConfig == nil {
+		// For simple mode, suppress logs by overriding log level via environment
+		// This will be picked up by viper during config loading
+		if os.Getenv("TERMINAL_AI_LOGGING_LEVEL") == "" {
+			os.Setenv("TERMINAL_AI_LOGGING_LEVEL", "fatal")
+		}
 		if err := initializeApp(); err != nil {
 			fmt.Printf("Error initializing: %v\n", err)
 			os.Exit(1)
@@ -108,6 +117,15 @@ func runQueryMode(prompt string) {
 	client := GetAIClient()
 	config := GetConfig()
 
+	// Get theme for coloring
+	theme := ui.GetCurrentTheme()
+	userStyle := lipgloss.NewStyle().Foreground(theme.UserInput)
+	aiStyle := lipgloss.NewStyle().Foreground(theme.AIResponse)
+
+	// Display user input (highlighted, no label)
+	fmt.Println(userStyle.Render(prompt))
+	fmt.Println()
+
 	// Prepare messages with helpful assistant prompt
 	messages := []ai.Message{
 		{
@@ -122,16 +140,25 @@ func runQueryMode(prompt string) {
 
 	// Prepare options
 	options := ai.ChatOptions{
-		Model:       config.OpenAI.Model,
-		Temperature: config.OpenAI.Temperature,
-		MaxTokens:   config.OpenAI.MaxTokens,
-		TopP:        config.OpenAI.TopP,
+		Model:           config.OpenAI.Model,
+		Temperature:     config.OpenAI.Temperature,
+		MaxTokens:       config.OpenAI.MaxTokens,
+		TopP:            config.OpenAI.TopP,
+		ReasoningEffort: config.OpenAI.ReasoningEffort,
+		ServiceTier:     config.OpenAI.ServiceTier,
 	}
 
 	// Override model if specified
 	if modelFlag != "" {
 		options.Model = modelFlag
 	}
+	
+	// Override service tier if specified
+	if serviceTierFlag != "" {
+		options.ServiceTier = serviceTierFlag
+	}
+
+	// Start AI response (no label)
 
 	if streamFlag {
 		// Stream response
@@ -147,7 +174,7 @@ func runQueryMode(prompt string) {
 				os.Exit(1)
 			}
 			if chunk.Content != "" {
-				fmt.Print(chunk.Content)
+				fmt.Print(aiStyle.Render(chunk.Content))
 			}
 		}
 		fmt.Println()
@@ -158,11 +185,16 @@ func runQueryMode(prompt string) {
 			fmt.Printf("Error: %v\n", err)
 			os.Exit(1)
 		}
-		fmt.Println(resp.Content)
+		fmt.Println(aiStyle.Render(resp.Content))
 	}
 }
 
 func runShellMode(prompt string) {
+	// Get theme for coloring
+	theme := ui.GetCurrentTheme()
+	userStyle := lipgloss.NewStyle().Foreground(theme.UserInput)
+	aiStyle := lipgloss.NewStyle().Foreground(theme.AIResponse)
+
 	if prompt == "" {
 		// Interactive mode - get prompt from user
 		fmt.Print("What do you want to do? > ")
@@ -174,6 +206,9 @@ func runShellMode(prompt string) {
 			return
 		}
 	}
+
+	// Display user input (highlighted, no label)
+	fmt.Println(userStyle.Render(prompt))
 
 	ctx := context.Background()
 	client := GetAIClient()
@@ -194,10 +229,12 @@ func runShellMode(prompt string) {
 
 		// Prepare options
 		options := ai.ChatOptions{
-			Model:       config.OpenAI.Model,
-			Temperature: config.OpenAI.Temperature,
-			MaxTokens:   config.OpenAI.MaxTokens,
-			TopP:        config.OpenAI.TopP,
+			Model:           config.OpenAI.Model,
+			Temperature:     config.OpenAI.Temperature,
+			MaxTokens:       config.OpenAI.MaxTokens,
+			TopP:            config.OpenAI.TopP,
+			ReasoningEffort: config.OpenAI.ReasoningEffort,
+			ServiceTier:     config.OpenAI.ServiceTier,
 		}
 
 		// Override model if specified
@@ -213,7 +250,8 @@ func runShellMode(prompt string) {
 		}
 
 		command := strings.TrimSpace(resp.Content)
-		fmt.Printf("\n📝 Command: %s\n", command)
+		// Display AI command (highlighted, no label)
+		fmt.Printf("\n%s\n", aiStyle.Render(command))
 
 		// Ask for confirmation
 		fmt.Print("\n🔸 Execute? [Enter/E=Execute, N=No, Q=Quit]: ")
@@ -238,6 +276,8 @@ func runShellMode(prompt string) {
 				fmt.Println("No clarification provided, exiting.")
 				return
 			}
+			// Display user feedback (highlighted, no label)
+			fmt.Println(userStyle.Render(clarification))
 			// Update prompt with clarification
 			prompt = fmt.Sprintf("%s\n\nUser feedback: %s", prompt, clarification)
 			continue
@@ -246,8 +286,8 @@ func runShellMode(prompt string) {
 			return
 		default:
 			fmt.Println("Invalid input. Please try again.")
-			// Re-ask for the same command
-			fmt.Printf("\n📝 Command: %s\n", command)
+			// Re-show the same command
+			fmt.Printf("\n%s\n", aiStyle.Render(command))
 			continue
 		}
 	}
