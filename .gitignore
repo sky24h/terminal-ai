@@ -1,0 +1,125 @@
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool
+*.out
+coverage.html
+
+# Dependency directories
+vendor/
+
+# Build directories
+build/
+dist/
+bin/
+
+# Go workspace file
+go.work
+
+# IDE specific files
+.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Configuration files with sensitive data
+.terminal-ai.yaml
+config.yaml
+config.json
+
+# Log files
+*.log
+logs/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Air (hot reload) temporary files
+tmp/
+
+# Debug files
+debug
+__debug_bin
+
+# Profile files
+*.prof
+*.pprof
+
+# Memory dump files
+*.heap
+
+# Binary output
+terminal-ai
+terminal-ai_*
+
+# OS specific
+Thumbs.db
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Archives
+*.tar
+*.tar.gz
+*.zip
+*.gz
+*.tgz
+*.rar
+
+# Backup files
+*.bak
+*.backup
+*.old
+
+# Cache directories
+.cache/
+cache/
+
+# Testing artifacts
+test-results/
+test-reports/
+
+# Documentation build
+docs/_build/
+docs/.jekyll-cache/
+
+# Python (for any Python scripts)
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+
+# Node (if using any Node tools)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Secrets and keys
+*.key
+*.pem
+*.crt
+*.cer
+secrets/

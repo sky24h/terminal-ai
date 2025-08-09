@@ -1,0 +1,145 @@
+# Terminal AI Configuration File
+# This file demonstrates the YAML configuration format
+# Place this file at:
+#   - ~/.terminal-ai/config.yaml (user-specific)
+#   - ./.terminal-ai.yaml (project-specific)
+#   - Or specify with --config flag
+
+# Profile selection (dev, prod, custom)
+profile: prod
+
+# OpenAI Configuration
+openai:
+  # API key - use environment variable reference for security
+  api_key: ${OPENAI_API_KEY}
+  
+  # Model selection (default: gpt-5-mini)
+  # Reasoning models: gpt-5, gpt-5-mini, gpt-5-nano, o1, o1-mini, o3, o3-mini, o4-mini
+  # Non-reasoning: gpt-4.1, gpt-4.1-mini, gpt-4.1-nano, gpt-4o, gpt-4o-mini, gpt-4, gpt-3.5-turbo
+  model: gpt-5-mini
+  
+  # Token limits
+  max_tokens: 2000
+  
+  # Temperature - MUST be 1.0 for reasoning models
+  # Non-reasoning models can use 0.0-2.0
+  temperature: 1.0
+  
+  # Reasoning effort for reasoning models (low, medium, high)
+  # Only applies to reasoning models like gpt-5, o1, o3
+  reasoning_effort: low
+  
+  # Top-p sampling (nucleus sampling)
+  top_p: 1.0
+  
+  # Number of completions to generate
+  n: 1
+  
+  # Request timeout
+  timeout: 30s
+  
+  # API base URL (for custom endpoints)
+  base_url: https://api.openai.com/v1
+  
+  # Organization ID (optional)
+  org_id: ""
+  
+  # Stop sequences (optional)
+  stop: []
+
+# Cache Configuration
+cache:
+  # Enable/disable caching
+  enabled: true
+  
+  # Cache time-to-live
+  ttl: 5m
+  
+  # Maximum cache size in MB
+  max_size: 100
+  
+  # Cache strategy (lru, lfu, fifo)
+  strategy: lru
+  
+  # Cache directory (defaults to ~/.terminal-ai/cache)
+  dir: ${HOME}/.terminal-ai/cache
+
+# UI Configuration
+ui:
+  # Enable streaming responses
+  streaming_enabled: true
+  
+  # Enable colored output
+  color_output: true
+  
+  # Enable markdown rendering
+  markdown_rendering: true
+  
+  # Enable syntax highlighting
+  syntax_highlighting: true
+  
+  # Color theme (dark, light, auto)
+  theme: auto
+  
+  # Spinner style (dots, line, star, arrow)
+  spinner: dots
+  
+  # Terminal width override (0 for auto-detect)
+  width: 0
+
+# Logging Configuration
+logging:
+  # Log level (debug, info, warn, error, fatal, panic)
+  level: info
+  
+  # Log format (json, text, pretty)
+  format: text
+  
+  # Log file path (empty for stdout)
+  file: ""
+  
+  # Never log API keys (security)
+  no_api: true
+
+# Development Profile Override Example
+# Uncomment to use development settings
+# ---
+# profile: dev
+# 
+# logging:
+#   level: debug
+#   format: pretty
+# 
+# cache:
+#   enabled: false
+# 
+# openai:
+#   timeout: 60s
+
+# Production Profile Override Example
+# ---
+# profile: prod
+# 
+# logging:
+#   level: info
+#   format: json
+#   file: /var/log/terminal-ai/app.log
+# 
+# cache:
+#   enabled: true
+#   strategy: lru
+#   max_size: 500
+
+# Custom Model Endpoint Example
+# ---
+# openai:
+#   base_url: http://localhost:8080/v1
+#   api_key: local-dev-key
+#   model: local-model
+
+# Azure OpenAI Example
+# ---
+# openai:
+#   base_url: https://your-resource.openai.azure.com/openai/deployments/your-deployment
+#   api_key: ${AZURE_OPENAI_KEY}
+#   model: gpt-35-turbo
