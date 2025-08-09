@@ -255,8 +255,8 @@ messages := []ai.Message{
 }
 
 options := ai.ChatOptions{
-    Model: "gpt-3.5-turbo",
-    Temperature: 0.7,
+    Model: "gpt-5-mini",
+    Temperature: 1.0,  // Required for reasoning models
 }
 
 // Chat with automatic caching

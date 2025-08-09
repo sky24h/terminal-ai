@@ -40,9 +40,11 @@ messages := []ai.Message{
 }
 
 options := ai.ChatOptions{
-    Model:       "gpt-3.5-turbo",
-    Temperature: 0.7,
-    MaxTokens:   100,
+    Model:           "gpt-5-mini",
+    Temperature:     1.0,      // Auto-adjusted for reasoning models
+    MaxTokens:       100,
+    ReasoningEffort: "low",    // For reasoning models
+    ServiceTier:     "default", // Service tier preference
 }
 
 response, err := client.Chat(ctx, messages, options)
@@ -69,13 +71,19 @@ The client integrates with the terminal-ai configuration system:
 ```yaml
 openai:
   api_key: ${OPENAI_API_KEY}
-  model: gpt-3.5-turbo
+  model: gpt-5-mini              # Default reasoning model
   max_tokens: 2000
-  temperature: 0.7
+  temperature: 1.0               # Must be 1.0 for reasoning models
+  reasoning_effort: low          # low, medium, high (for reasoning models)
+  service_tier: default          # auto, default, priority, flex, scale
   timeout: 30s
   base_url: https://api.openai.com/v1
   org_id: ""
   top_p: 1.0
+
+# Supported Models:
+# Reasoning: gpt-5, gpt-5-mini, gpt-5-nano, o1, o1-mini, o3, o3-mini, o4-mini
+# Non-reasoning: gpt-4.1, gpt-4.1-mini, gpt-4.1-nano, gpt-4o, gpt-4o-mini
 ```
 
 ## Architecture
@@ -137,6 +145,20 @@ The client distinguishes between:
 - **Retryable Errors**: Network issues, rate limits, server errors (5xx)
 - **Non-Retryable Errors**: Authentication failures, invalid requests (4xx)
 - **Context Errors**: Timeouts and cancellations
+
+## Recent Updates
+
+### GPT-5 and O-series Support
+- Full support for reasoning models (gpt-5, gpt-5-mini, o1, o3, etc.)
+- Automatic temperature adjustment to 1.0 for reasoning models
+- reasoning_effort parameter support (low, medium, high)
+- Service tier support for priority processing
+
+### Service Tier Features
+- Support for OpenAI's service tier parameter
+- Options: auto, default, priority, flex, scale
+- Configurable via config file or command-line flag
+- All models default to "default" tier unless overridden
 
 ## Future Enhancements
 

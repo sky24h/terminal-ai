@@ -211,7 +211,7 @@ metrics.RecordCacheMiss()
 
 ```go
 metrics.RecordTokenUsage(utils.TokenUsage{
-    Model:            "gpt-4",
+    Model:            "gpt-5-mini",
     PromptTokens:     150,
     CompletionTokens: 250,
     TotalTokens:      400,

@@ -24,9 +24,11 @@ All configuration values can be set via environment variables with the `TERMINAL
 ```bash
 # OpenAI settings
 export TERMINAL_AI_OPENAI_API_KEY="your-key"
-export TERMINAL_AI_OPENAI_MODEL="gpt-4"
+export TERMINAL_AI_OPENAI_MODEL="gpt-5-mini"
 export TERMINAL_AI_OPENAI_MAX_TOKENS="4000"
-export TERMINAL_AI_OPENAI_TEMPERATURE="0.7"
+export TERMINAL_AI_OPENAI_TEMPERATURE="1.0"
+export TERMINAL_AI_OPENAI_SERVICE_TIER="default"
+export TERMINAL_AI_OPENAI_REASONING_EFFORT="low"
 
 # Cache settings
 export TERMINAL_AI_CACHE_ENABLED="true"
@@ -57,15 +59,28 @@ profile: prod  # Options: dev, prod, custom
 # OpenAI Configuration
 openai:
   api_key: ${OPENAI_API_KEY}  # Use env var reference for security
-  model: gpt-3.5-turbo
+  model: gpt-5-mini            # Default reasoning model
   max_tokens: 2000
-  temperature: 0.7
+  temperature: 1.0             # Must be 1.0 for reasoning models
+  reasoning_effort: low        # low, medium, high (for reasoning models)
+  service_tier: default        # auto, default, priority, flex, scale
   top_p: 1.0
   n: 1
   timeout: 30s
   base_url: https://api.openai.com/v1
   org_id: ""
   stop: []
+
+# Model Types:
+# Reasoning (temp=1.0): gpt-5, gpt-5-mini, gpt-5-nano, o1, o1-mini, o3, o3-mini, o4-mini
+# Non-reasoning: gpt-4.1, gpt-4.1-mini, gpt-4.1-nano, gpt-4o, gpt-4o-mini
+
+# Service Tiers:
+# - auto: Uses project settings
+# - default: Standard processing (default for all models)
+# - priority: Faster performance (enterprise only)
+# - flex: Non-time-sensitive tasks
+# - scale: Dedicated capacity
 
 # Cache Configuration
 cache:
@@ -149,8 +164,10 @@ openai:
 The configuration system performs comprehensive validation:
 
 - **API Key**: Format validation, presence check
-- **Model**: Validates against supported OpenAI models
-- **Temperature**: Must be between 0 and 2
+- **Model**: Validates against supported OpenAI models (including GPT-5 and O-series)
+- **Temperature**: Must be between 0 and 2 (automatically set to 1.0 for reasoning models)
+- **Reasoning Effort**: Must be low, medium, or high for reasoning models
+- **Service Tier**: Must be auto, default, priority, flex, or scale
 - **Top-p**: Must be between 0 and 1
 - **Max Tokens**: Model-specific limits enforced
 - **Timeout**: Minimum 5 seconds, maximum 5 minutes
@@ -223,7 +240,7 @@ Solution: Set OPENAI_API_KEY environment variable
 ### Invalid Model
 ```
 Error: unsupported model: xxx
-Solution: Use a valid OpenAI model name (gpt-3.5-turbo, gpt-4, etc.)
+Solution: Use a valid OpenAI model name (gpt-5-mini, gpt-5, o1, o3, gpt-4o, etc.)
 ```
 
 ### Permission Denied

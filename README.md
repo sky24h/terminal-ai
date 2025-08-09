@@ -71,16 +71,16 @@ terminal-ai config --test
 terminal-ai -s "list all docker containers"
 terminal-ai "find large files"  # Same as above, defaults to -s
 
-# Shell command generator (-s)
-terminal-ai -s "list all docker containers"
-# → Shows command and asks: Execute? [Enter/E/N/Q]
+# Query mode for concise answers
+terminal-ai -q "What is Docker?"
 
 # Interactive chat mode (-c)
 terminal-ai -c
 
 # With options
 terminal-ai -q -m gpt-5 "Explain quantum computing"
-terminal-ai -s --no-stream "find large files"
+terminal-ai -s --service-tier priority "find large files"
+terminal-ai --no-stream "list processes"
 ```
 
 ## Configuration
@@ -101,13 +101,21 @@ openai:
   model: gpt-5-mini            # Default reasoning model
   max_tokens: 2000
   temperature: 1.0             # Must be 1.0 for reasoning models
-  reasoning_effort: low        # low, medium, high (ready for when library supports it)
+  reasoning_effort: low        # low, medium, high
+  service_tier: default        # auto, default, priority, flex, scale
   timeout: 30s
   organization: ""             # Optional: OpenAI organization ID
 
 # Model Types:
 # Reasoning (temp=1.0): gpt-5, gpt-5-mini, gpt-5-nano, o1, o1-mini, o3, o3-mini, o4-mini
 # Non-reasoning: gpt-4.1, gpt-4.1-mini, gpt-4.1-nano, gpt-4o, gpt-4o-mini
+
+# Service Tiers:
+# - auto: Uses project settings
+# - default: Standard processing (default for all models)
+# - priority: Faster performance (enterprise only)
+# - flex: Non-time-sensitive tasks
+# - scale: Dedicated capacity
 
 cache:
   enabled: true
@@ -143,6 +151,10 @@ export TERMINAL_AI_CACHE_ENABLED="true"
 export TERMINAL_AI_CACHE_TTL="5m"
 export TERMINAL_AI_CACHE_MAX_SIZE="100"
 
+# Service tier
+export TERMINAL_AI_OPENAI_SERVICE_TIER="default"
+export TERMINAL_AI_OPENAI_REASONING_EFFORT="low"
+
 # UI settings
 export TERMINAL_AI_UI_THEME="dark"
 export TERMINAL_AI_UI_STREAMING_ENABLED="true"
@@ -168,8 +180,8 @@ Generate and optionally execute shell commands:
 terminal-ai "find all log files larger than 100MB"  # defaults to -s
 terminal-ai -s "list docker containers"
 # Output:
-# 📝 Command: find / -name "*.log" -size +100M 2>/dev/null
-# 🔸 Execute? [Enter/E=Execute, N=No, Q=Quit]: 
+# find / -name "*.log" -size +100M 2>/dev/null
+# Execute? [Enter/E=Execute, N=Refine, Q=Quit]: 
 ```
 
 Interactive refinement:
@@ -199,15 +211,16 @@ terminal-ai -c
 ## Global Options
 
 ```bash
--q, --query         Query mode for questions
--s, --shell         Shell command generator mode (default when text provided)
--s, --shell         Shell command generator mode
--c, --chat          Interactive chat mode
--m, --model string  Override default model
-    --stream        Enable streaming (default true)
--v, --verbose       Verbose output
-    --no-color      Disable colored output
-    --config file   Custom config file path
+-q, --query                 Query mode for questions
+-s, --shell                 Shell command generator mode (default when text provided)
+-c, --chat                  Interactive chat mode
+-m, --model string          Override default model
+    --service-tier string   Service tier (auto, default, priority, flex, scale)
+    --stream                Enable streaming (default true)
+    --no-stream             Disable streaming
+-v, --verbose               Verbose output
+    --no-color              Disable colored output
+    --config file           Custom config file path
 ```
 
 ## Legacy Commands
@@ -365,6 +378,33 @@ go test -bench=. ./...
 ```
 
 ## Examples
+
+### Basic Usage Examples
+
+```bash
+# Simple query with concise output
+terminal-ai -q "How to check disk usage in Linux?"
+
+# Shell command with priority processing
+terminal-ai --service-tier priority "monitor system performance"
+
+# Reasoning model with high effort
+terminal-ai -m o3-mini -q "Explain the algorithm for..."
+```
+
+### Advanced Examples
+
+```bash
+# Interactive refinement in shell mode
+terminal-ai "backup database safely"
+# Shows command, press N to refine, Enter to execute
+
+# Chat mode with custom model
+terminal-ai -c -m gpt-5
+
+# Disable streaming for scripting
+terminal-ai --no-stream -q "list git commands" > commands.txt
+```
 
 Check out the `examples/` directory for detailed usage examples:
 
