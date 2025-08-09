@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/charmbracelet/lipgloss"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/user/terminal-ai/internal/ai"
@@ -153,13 +154,18 @@ func RunChat(cmd *cobra.Command, args []string) error {
 	fmt.Println("Type '/help' for available commands or '/exit' to quit")
 	fmt.Println()
 
+	// Get theme for coloring
+	theme := ui.GetCurrentTheme()
+	userStyle := lipgloss.NewStyle().Foreground(theme.UserInput)
+	aiStyle := lipgloss.NewStyle().Foreground(theme.AIResponse)
+
 	// Chat loop
 	reader := bufio.NewReader(os.Stdin)
 	ctx := context.Background()
 
 	for {
 		// Get user input
-		fmt.Print("> ")
+		fmt.Print(userStyle.Render("You: "))
 
 		var userInput string
 		var err error
@@ -192,6 +198,9 @@ func RunChat(cmd *cobra.Command, args []string) error {
 			continue
 		}
 
+		// Display user input with color
+		fmt.Printf("%s %s\n", userStyle.Render("You:"), userInput)
+		
 		// Add user message to history
 		messages = append(messages, ai.Message{
 			Role:    "user",
@@ -214,7 +223,7 @@ func RunChat(cmd *cobra.Command, args []string) error {
 			}
 
 			spinner.Stop()
-			fmt.Print("Assistant: ")
+			fmt.Print(aiStyle.Render("AI: "))
 
 			// Collect and display response
 			var responseBuilder strings.Builder
@@ -227,7 +236,7 @@ func RunChat(cmd *cobra.Command, args []string) error {
 					break
 				}
 				responseBuilder.WriteString(chunk.Content)
-				fmt.Print(chunk.Content)
+				fmt.Print(aiStyle.Render(chunk.Content))
 			}
 			fmt.Println()
 
@@ -254,8 +263,7 @@ func RunChat(cmd *cobra.Command, args []string) error {
 			spinner.Stop()
 
 			// Display response
-			fmt.Print("Assistant: ")
-			fmt.Println(resp.Content)
+			fmt.Printf("%s %s\n", aiStyle.Render("AI:"), aiStyle.Render(resp.Content))
 			fmt.Println()
 
 			// Show token usage if cache is enabled
@@ -380,14 +388,30 @@ func handleSimpleChatCommand(command string, messages *[]ai.Message, options *ai
 		}
 
 	case "/history":
+		// Get theme for coloring
+		theme := ui.GetCurrentTheme()
+		userStyle := lipgloss.NewStyle().Foreground(theme.UserInput)
+		aiStyle := lipgloss.NewStyle().Foreground(theme.AIResponse)
+		systemStyle := lipgloss.NewStyle().Foreground(theme.TextMuted)
+		
 		fmt.Println("\n=== Conversation History ===")
 		for i, msg := range *messages {
-			role := strings.Title(msg.Role)
 			preview := msg.Content
 			if len(preview) > 100 {
 				preview = preview[:97] + "..."
 			}
-			fmt.Printf("%d. [%s] %s\n", i+1, role, preview)
+			
+			// Color based on role
+			switch msg.Role {
+			case "user":
+				fmt.Printf("%d. %s %s\n", i+1, userStyle.Render("You:"), preview)
+			case "assistant":
+				fmt.Printf("%d. %s %s\n", i+1, aiStyle.Render("AI:"), preview)
+			case "system":
+				fmt.Printf("%d. %s %s\n", i+1, systemStyle.Render("System:"), preview)
+			default:
+				fmt.Printf("%d. [%s] %s\n", i+1, strings.Title(msg.Role), preview)
+			}
 		}
 		fmt.Println()
 

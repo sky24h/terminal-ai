@@ -31,6 +31,10 @@ type Theme struct {
 	TextMuted  lipgloss.Color
 	TextBright lipgloss.Color
 
+	// AI/User distinction colors
+	AIResponse lipgloss.Color // Rose red for AI responses
+	UserInput  lipgloss.Color // Different color for user input
+
 	// Background colors
 	Background    lipgloss.Color
 	BackgroundAlt lipgloss.Color
@@ -66,6 +70,10 @@ func DarkTheme() *Theme {
 		Text:       lipgloss.Color("252"), // Light gray
 		TextMuted:  lipgloss.Color("245"), // Medium gray
 		TextBright: lipgloss.Color("255"), // White
+
+		// AI/User distinction colors
+		AIResponse: lipgloss.Color("211"), // Rose red for AI responses
+		UserInput:  lipgloss.Color("86"),  // Cyan for user input
 
 		// Background colors
 		Background:    lipgloss.Color("235"), // Dark gray
@@ -103,6 +111,10 @@ func LightTheme() *Theme {
 		Text:       lipgloss.Color("235"), // Dark gray
 		TextMuted:  lipgloss.Color("244"), // Medium gray
 		TextBright: lipgloss.Color("232"), // Black
+
+		// AI/User distinction colors
+		AIResponse: lipgloss.Color("204"), // Rose red for AI responses
+		UserInput:  lipgloss.Color("33"),  // Blue for user input
 
 		// Background colors
 		Background:    lipgloss.Color("255"), // White
